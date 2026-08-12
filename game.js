@@ -13,6 +13,13 @@
   const startBtn = document.getElementById("start-btn");
   const restartBtn = document.getElementById("restart-btn");
 
+  // i18n.js (loaded before this file) exposes window.SNOWCRAFT_I18N.t(key).
+  // Falls back to returning the key itself if i18n.js failed to load, so a
+  // missing translation never crashes the game — just shows a raw key.
+  function tr(key) {
+    return window.SNOWCRAFT_I18N ? window.SNOWCRAFT_I18N.t(key) : key;
+  }
+
   let W = 800, H = 600;
   let scale = 1;
 
@@ -492,8 +499,8 @@
       });
     }
 
-    levelEl.textContent = `Level ${level}`;
-    showMessage(`Level ${level}`, 1.2);
+    levelEl.textContent = `${tr("level")}${level}${tr("levelSuffix")}`;
+    showMessage(`${tr("level")}${level}${tr("levelSuffix")}`, 1.2);
   }
 
   function updateScore() {
@@ -537,8 +544,14 @@
           const dx = target.x - e.x;
           const dy = target.y - e.y;
           const dist = Math.hypot(dx, dy) || 1;
+          // BALANCE FIX: the old formula's level term (level*12) was tiny next
+          // to its base+random range (260-420), so every level felt about
+          // equally fast and level 1 in particular threw much too quickly to
+          // react to. Lowered the base/random range and raised the per-level
+          // term so level 1 throws slow and lobbed, ramping up meaningfully
+          // as level increases.
           const g = 380 * scale;
-          const refSpeed = (260 + Math.random() * 160 + level * 12) * scale;
+          const refSpeed = (150 + level * 22 + Math.random() * 40) * scale;
           const t = Math.max(0.35, Math.min(1.4, dist / refSpeed));
           const vx = dx / t;
           const vy = (dy - 0.5 * g * t * t) / t;
@@ -711,7 +724,7 @@
       playWin();
       score += 500 + level * 100;
       updateScore();
-      showMessage("過關！", 1.5);
+      showMessage(tr("stageClear"), 1.5);
       setTimeout(() => {
         level++;
         setupLevel();
@@ -720,7 +733,7 @@
     } else if (alivePlayers === 0) {
       gameState = STATE.GAME_OVER;
       playLose();
-      finalScoreEl.textContent = `分數：${score}`;
+      finalScoreEl.textContent = `${tr("scoreLabel")}${score}`;
       gameOverScreen.classList.remove("hidden");
     }
   }
@@ -823,6 +836,18 @@
 
   startBtn.addEventListener("click", startGame);
   restartBtn.addEventListener("click", startGame);
+
+  // Lets i18n.js refresh text that this script sets dynamically (level
+  // indicator, final score) when the user switches language mid-game —
+  // static HTML text is already handled by i18n.js itself via [data-i18n].
+  window.SNOWCRAFT_ON_LANG_CHANGE = () => {
+    if (gameState === STATE.PLAYING || gameState === STATE.LEVEL_CLEAR) {
+      levelEl.textContent = `${tr("level")}${level}${tr("levelSuffix")}`;
+    }
+    if (gameState === STATE.GAME_OVER) {
+      finalScoreEl.textContent = `${tr("scoreLabel")}${score}`;
+    }
+  };
 
   // 初始
   requestAnimationFrame(loop);

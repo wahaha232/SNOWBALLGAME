@@ -27,11 +27,39 @@ html, body {
 }
 
 #banner {
+  position: relative;
   background: linear-gradient(180deg, #6fa8ff 0%, #1e5ecb 50%, #003399 100%);
   border: 3px inset #ffffff;
   text-align: center;
   padding: 10px 0 14px;
   margin-bottom: 10px;
+}
+
+.lang-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  background: #ffffe0;
+  color: #003399;
+  border: 2px outset #fff;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.lang-btn:hover {
+  transform: none;
+  box-shadow: none;
+  background: #fffbc0;
+}
+
+.lang-btn:active {
+  border: 2px inset #fff;
 }
 
 #banner h1 {

@@ -7,7 +7,7 @@
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#000080">
   <link rel="canonical" href="https://wahaha232.github.io/SNOWBALLGAME/">
-  <title>★彡 SNOWCRAFT 打雪仗 彡★</title>
+  <title data-i18n="pageTitle">★彡 SNOWCRAFT 打雪仗 彡★</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
@@ -18,10 +18,11 @@
   <div id="page">
 
     <div id="banner">
+      <button id="lang-toggle" class="lang-btn">EN</button>
       <div class="marquee-wrap">
-        <div class="marquee-text">❄ 歡迎光臨 SNOWCRAFT 打雪仗小遊戲主頁 ❄ 本站最適合以 800x600 解析度瀏覽 ❄ 歡迎光臨 SNOWCRAFT 打雪仗小遊戲主頁 ❄</div>
+        <div class="marquee-text" data-i18n="marquee">❄ 歡迎光臨 SNOWCRAFT 打雪仗小遊戲主頁 ❄ 本站最適合以 800x600 解析度瀏覽 ❄ 歡迎光臨 SNOWCRAFT 打雪仗小遊戲主頁 ❄</div>
       </div>
-      <h1>❄ SNOWCRAFT ❄<br><span class="subtitle">～經典打雪仗網頁遊戲～</span></h1>
+      <h1>❄ SNOWCRAFT ❄<br><span class="subtitle" data-i18n="subtitle">～經典打雪仗網頁遊戲～</span></h1>
     </div>
 
     <div id="stage-frame">
@@ -33,41 +34,42 @@
           <div id="message" class="hidden"></div>
           <div id="start-screen">
             <h1>❄ Snowcraft ❄</h1>
-            <p>經典打雪仗</p>
-            <p class="controls">操作：點擊並按住紅帽角色移動，放開滑鼠投擲雪球</p>
-            <button id="start-btn">開始遊戲</button>
+            <p data-i18n="startSubtitle">經典打雪仗</p>
+            <p class="controls" data-i18n="startControls">操作：點擊並按住紅帽角色移動，放開滑鼠投擲雪球</p>
+            <button id="start-btn" data-i18n="startBtn">開始遊戲</button>
           </div>
           <div id="game-over" class="hidden">
-            <h2>遊戲結束</h2>
+            <h2 data-i18n="gameOverTitle">遊戲結束</h2>
             <p id="final-score">分數：0</p>
-            <button id="restart-btn">再玩一次</button>
+            <button id="restart-btn" data-i18n="restartBtn">再玩一次</button>
           </div>
         </div>
       </div>
     </div>
 
     <table id="howto-table" cellpadding="0" cellspacing="0">
-      <tr><td class="howto-title">📜 遊戲說明 README.TXT 📜</td></tr>
+      <tr><td class="howto-title" data-i18n="howtoTitle">📜 遊戲說明 README.TXT 📜</td></tr>
       <tr><td class="howto-body">
         <ul>
-          <li>🖱️ 用滑鼠<b>點擊並按住</b>下方紅帽角色</li>
-          <li>🖱️ 移動滑鼠<b>拖曳</b>該角色（只能在下半場活動）</li>
-          <li>🖱️ <b>放開滑鼠</b>即可朝滑鼠方向投擲雪球，按住越久力道越強</li>
-          <li>🎯 目標：打倒所有綠色敵人進入下一關</li>
-          <li>❤️ 紅隊每位角色可承受 <b>2 次</b>命中，綠隊 <b>3 次</b></li>
-          <li>💀 全部紅隊倒下則遊戲結束</li>
+          <li data-i18n="howto1">🖱️ 用滑鼠<b>點擊並按住</b>下方紅帽角色</li>
+          <li data-i18n="howto2">🖱️ 移動滑鼠<b>拖曳</b>該角色（只能在下半場活動）</li>
+          <li data-i18n="howto3">🖱️ <b>放開滑鼠</b>即可朝滑鼠方向投擲雪球，按住越久力道越強</li>
+          <li data-i18n="howto4">🎯 目標：打倒所有綠色敵人進入下一關</li>
+          <li data-i18n="howto5">❤️ 紅隊每位角色可承受 <b>2 次</b>命中，綠隊 <b>3 次</b></li>
+          <li data-i18n="howto6">💀 全部紅隊倒下則遊戲結束</li>
         </ul>
       </td></tr>
     </table>
 
     <div id="footer">
       <hr>
-      <p>© <span id="year"></span> Snowcraft 打雪仗小遊戲 ｜ 最佳瀏覽環境：Netscape Navigator 4.0 以上 😉</p>
-      <p class="blink">👷 本網站持續施工中 👷</p>
+      <p>© <span id="year"></span> <span data-i18n="footerCopy">Snowcraft 打雪仗小遊戲 ｜ 最佳瀏覽環境：Netscape Navigator 4.0 以上 😉</span></p>
+      <p class="blink" data-i18n="footerBlink">👷 本網站持續施工中 👷</p>
     </div>
 
   </div>
 
+  <script src="i18n.js"></script>
   <script src="game.js"></script>
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
