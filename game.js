@@ -267,13 +267,14 @@
       this.y = Math.max(margin + 30, Math.min(H - margin - 10, this.y));
     }
 
-    // ART STYLE: redrawn to match the reference screenshot's look — a chibi
-    // figure with small dark boots, a rounded snowsuit body in the team
-    // color, and an asymmetric pointed hood with a curled tip (instead of
-    // the previous plain circle + symmetric arc). A ground-level selection
-    // reticle (concentric flattened rings) replaces the old glow ring, and
-    // knocked-out characters now squash flat into a "splat" on the ground
-    // instead of just fading out standing upright.
+    // ART STYLE: matches the reference screenshot's minimal look — a single
+    // flat team-colored oval (no separate hood/face color blocks) with two
+    // small dark boots and two eye dots painted directly on the body. A
+    // ground-level selection reticle (concentric flattened rings, matching
+    // the reference's on-ground target circles under the active red unit)
+    // plus orbiting sparkle stars while charging. Knocked-out characters
+    // squash flat into a "splat" on the ground instead of fading out
+    // standing upright.
     draw(ctx) {
       if (!this.alive && this.koTimer <= 0) return;
       const r = this.radius;
@@ -346,55 +347,32 @@
 
       // 陰影
       ctx.beginPath();
-      ctx.ellipse(0, r * 0.95, r * 0.65, r * 0.22, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, r * 0.95, r * 0.6, r * 0.2, 0, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(0,0,0,0.12)";
       ctx.fill();
 
-      // 腳 (boots)
-      ctx.fillStyle = "#2c3e50";
-      [-0.3, 0.3].forEach(ox => {
+      // 腳 (兩個小小的深藍色橢圓，貼在身體下方，比照參考圖)
+      ctx.fillStyle = "#22335a";
+      [-0.28, 0.28].forEach(ox => {
         ctx.beginPath();
-        ctx.ellipse(ox * r, r * 0.82, r * 0.22, r * 0.3, 0, 0, Math.PI * 2);
+        ctx.ellipse(ox * r, r * 0.8, r * 0.2, r * 0.26, 0, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // 身體 (橢圓，比正圓更像雪衣輪廓)
+      // 身體 — 單一團隊色的圓潤橢圓（不分帽子/臉部色塊，比照參考圖的極簡造型）
       ctx.beginPath();
-      ctx.ellipse(0, r * 0.12, r * 0.82, r * 0.92, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, -r * 0.05, r * 0.78, r * 0.85, 0, 0, Math.PI * 2);
       ctx.fillStyle = flash ? "#fff" : this.color;
       ctx.fill();
       ctx.strokeStyle = "rgba(0,0,0,0.15)";
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 1;
       ctx.stroke();
 
-      // 帽子 — 不對稱尖帽，一側垂下並捲起（取代原本置中的對稱弧形）
-      const hoodDir = this.isPlayer ? 1 : -1;
+      // 眼睛（直接畫在身體色塊上，不另外畫白色臉部區塊）
+      ctx.fillStyle = "#1a1a1a";
       ctx.beginPath();
-      ctx.moveTo(-r * 0.62 * hoodDir, -r * 0.05);
-      ctx.quadraticCurveTo(-r * 0.55 * hoodDir, -r * 0.95, r * 0.05 * hoodDir, -r * 1.05);
-      ctx.quadraticCurveTo(r * 0.75 * hoodDir, -r * 0.85, r * 0.95 * hoodDir, -r * 0.15);
-      ctx.quadraticCurveTo(r * 1.35 * hoodDir, r * 0.25, r * 1.05 * hoodDir, r * 0.35);
-      ctx.quadraticCurveTo(r * 0.85 * hoodDir, r * 0.15, r * 0.6 * hoodDir, -r * 0.05);
-      ctx.closePath();
-      ctx.fillStyle = flash ? "#eee" : this.hatColor;
-      ctx.fill();
-      // pom-pom at the tip of the hood
-      ctx.beginPath();
-      ctx.arc(r * 1.05 * hoodDir, r * 0.35, r * 0.16, 0, Math.PI * 2);
-      ctx.fillStyle = flash ? "#eee" : this.hatColor;
-      ctx.fill();
-
-      // 臉部白區
-      ctx.beginPath();
-      ctx.ellipse(0, r * 0.05, r * 0.5, r * 0.48, 0, 0, Math.PI * 2);
-      ctx.fillStyle = flash ? "#fff" : "#fefefe";
-      ctx.fill();
-
-      // 眼睛
-      ctx.fillStyle = "#222";
-      ctx.beginPath();
-      ctx.arc(-r * 0.2, r * 0.0, r * 0.11, 0, Math.PI * 2);
-      ctx.arc(r * 0.2, r * 0.0, r * 0.11, 0, Math.PI * 2);
+      ctx.arc(-r * 0.22, -r * 0.08, r * 0.1, 0, Math.PI * 2);
+      ctx.arc(r * 0.22, -r * 0.08, r * 0.1, 0, Math.PI * 2);
       ctx.fill();
 
       // HP 指示（小點）
