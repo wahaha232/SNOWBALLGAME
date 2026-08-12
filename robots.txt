@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wahaha232.github.io/SNOWBALLGAME/sitemap.xml
