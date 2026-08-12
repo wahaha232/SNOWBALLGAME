@@ -214,6 +214,13 @@
       this.targetX = x;
       this.aiTimer = 0;
       this.throwPower = 0;
+      // Footprint trail (matches the reference art's dotted footprint paths
+      // behind moving characters). A new point is dropped whenever the
+      // character has moved far enough since the last one; each point fades
+      // out over time and the list is capped so old trails don't linger.
+      this.footTrail = [];
+      this.lastFootX = x;
+      this.lastFootY = y;
     }
 
     // BUG FIX: radius used to be baked in once at spawn time (`18 * scale`), so
@@ -272,6 +279,16 @@
       const margin = this.radius + 4;
       this.x = Math.max(margin, Math.min(W - margin, this.x));
       this.y = Math.max(margin + 30, Math.min(H - margin - 10, this.y));
+
+      const movedDist = Math.hypot(this.x - this.lastFootX, this.y - this.lastFootY);
+      if (movedDist > this.radius * 0.7) {
+        this.footTrail.push({ x: this.x, y: this.y, life: 1 });
+        if (this.footTrail.length > 6) this.footTrail.shift();
+        this.lastFootX = this.x;
+        this.lastFootY = this.y;
+      }
+      this.footTrail.forEach(f => { f.life -= dt * 0.4; });
+      this.footTrail = this.footTrail.filter(f => f.life > 0);
     }
 
     // ART STYLE: matches the reference screenshot's minimal look — a single
@@ -285,6 +302,15 @@
     draw(ctx) {
       if (!this.alive && this.koTimer <= 0) return;
       const r = this.radius;
+
+      // Footprints — drawn in absolute page coordinates (before translating
+      // into character-local space below) so they stay on the ground.
+      this.footTrail.forEach(f => {
+        ctx.beginPath();
+        ctx.ellipse(f.x, f.y + r * 0.85, r * 0.16, r * 0.1, 0, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(90,100,120,${0.35 * f.life})`;
+        ctx.fill();
+      });
 
       ctx.save();
       ctx.translate(this.x, this.y);
@@ -358,12 +384,19 @@
       ctx.fillStyle = "rgba(0,0,0,0.12)";
       ctx.fill();
 
-      // 腳 (兩個小小的深藍色橢圓，貼在身體下方，比照參考圖)
-      ctx.fillStyle = "#22335a";
+      // 褲管 + 靴子（深藍褲管 + 白色靴子，兩層貼在身體下方，比照參考圖）
       [-0.28, 0.28].forEach(ox => {
         ctx.beginPath();
-        ctx.ellipse(ox * r, r * 0.8, r * 0.2, r * 0.26, 0, 0, Math.PI * 2);
+        ctx.ellipse(ox * r, r * 0.68, r * 0.17, r * 0.22, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#3b3f7a";
         ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(ox * r, r * 0.88, r * 0.22, r * 0.16, 0, 0, Math.PI * 2);
+        ctx.fillStyle = flash ? "#fff" : "#fefefe";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(0,0,0,0.15)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
       });
 
       // 身體 — 單一團隊色的圓潤橢圓（不分帽子/臉部色塊，比照參考圖的極簡造型）
@@ -374,6 +407,17 @@
       ctx.strokeStyle = "rgba(0,0,0,0.15)";
       ctx.lineWidth = 1;
       ctx.stroke();
+
+      // 手套（藍色連指手套，貼在身體兩側，比照參考圖）
+      ctx.fillStyle = flash ? "#fff" : "#3f7fd1";
+      ctx.strokeStyle = "rgba(0,0,0,0.15)";
+      ctx.lineWidth = 1;
+      [-0.78, 0.78].forEach(ox => {
+        ctx.beginPath();
+        ctx.arc(ox * r, r * 0.15, r * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
 
       // 眼睛（直接畫在身體色塊上，不另外畫白色臉部區塊）
       ctx.fillStyle = "#1a1a1a";
