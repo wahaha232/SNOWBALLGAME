@@ -1,0 +1,17 @@
+{
+  "name": "Snowcraft - 打雪仗",
+  "short_name": "Snowcraft",
+  "description": "經典網頁小遊戲打雪仗現代重製版，用滑鼠控制紅隊與綠隊雪球大戰！",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#cce8f5",
+  "theme_color": "#2c6cb0",
+  "icons": [
+    {
+      "src": "assets/images/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

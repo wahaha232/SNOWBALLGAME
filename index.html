@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="經典打雪仗遊戲 Snowcraft 現代網頁重製版 - 用滑鼠控制紅隊與綠隊展開雪球大戰！">
+  <meta name="theme-color" content="#e8f4fc">
+  <title>Snowcraft - 打雪仗</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="assets/images/favicon.ico">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui-overlay">
+      <div id="score">0</div>
+      <div id="level">Level 1</div>
+      <div id="message" class="hidden"></div>
+      <div id="start-screen">
+        <h1>❄ Snowcraft ❄</h1>
+        <p>經典打雪仗</p>
+        <p class="controls">操作：點擊並按住紅帽角色移動，放開滑鼠投擲雪球</p>
+        <button id="start-btn">開始遊戲</button>
+      </div>
+      <div id="game-over" class="hidden">
+        <h2>遊戲結束</h2>
+        <p id="final-score">分數：0</p>
+        <button id="restart-btn">再玩一次</button>
+      </div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

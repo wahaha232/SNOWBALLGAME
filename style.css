@@ -1,0 +1,170 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #cce8f5;
+  font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #a8d8f0 0%, #e8f4fc 60%, #f5fafc 100%);
+}
+
+#gameCanvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  background: transparent;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+#ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#score {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c5aa0;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+  letter-spacing: 1px;
+}
+
+#level {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #3a6ea5;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
+#message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a4a7a;
+  text-shadow: 0 2px 8px rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.75);
+  padding: 16px 32px;
+  border-radius: 12px;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+#message.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+#start-screen, #game-over {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(200, 230, 250, 0.92);
+  pointer-events: auto;
+  text-align: center;
+  padding: 20px;
+}
+
+#start-screen.hidden, #game-over.hidden {
+  display: none;
+}
+
+#start-screen h1 {
+  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  color: #1e5a9a;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(255,255,255,0.8);
+}
+
+#start-screen p {
+  font-size: 1.1rem;
+  color: #3a6ea5;
+  margin: 6px 0;
+}
+
+#start-screen .controls {
+  font-size: 0.95rem;
+  color: #5a7ea5;
+  max-width: 360px;
+  margin: 16px 0 28px;
+  line-height: 1.5;
+}
+
+#game-over h2 {
+  font-size: 2.4rem;
+  color: #c0392b;
+  margin-bottom: 12px;
+}
+
+#final-score {
+  font-size: 1.4rem;
+  color: #2c5aa0;
+  margin-bottom: 28px;
+}
+
+button {
+  pointer-events: auto;
+  background: linear-gradient(180deg, #4a90d9, #2c6cb0);
+  color: white;
+  border: none;
+  padding: 14px 40px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(44, 108, 176, 0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(44, 108, 176, 0.5);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* 小螢幕調整 */
+@media (max-width: 600px) {
+  #score { font-size: 22px; top: 12px; right: 14px; }
+  #level { font-size: 16px; top: 12px; left: 14px; }
+  #message { font-size: 26px; padding: 12px 20px; }
+}
