@@ -4,33 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="description" content="經典打雪仗遊戲 Snowcraft 現代網頁重製版 - 用滑鼠控制紅隊與綠隊展開雪球大戰！">
-  <meta name="theme-color" content="#e8f4fc">
-  <title>Snowcraft - 打雪仗</title>
+  <meta name="theme-color" content="#000080">
+  <title>★彡 SNOWCRAFT 打雪仗 彡★</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="assets/images/favicon.ico">
 </head>
 <body>
-  <div id="game-container">
-    <canvas id="gameCanvas"></canvas>
-    <div id="ui-overlay">
-      <div id="score">0</div>
-      <div id="level">Level 1</div>
-      <div id="message" class="hidden"></div>
-      <div id="start-screen">
-        <h1>❄ Snowcraft ❄</h1>
-        <p>經典打雪仗</p>
-        <p class="controls">操作：點擊並按住紅帽角色移動，放開滑鼠投擲雪球</p>
-        <button id="start-btn">開始遊戲</button>
+
+  <div id="page">
+
+    <div id="banner">
+      <div class="marquee-wrap">
+        <div class="marquee-text">❄ 歡迎光臨 SNOWCRAFT 打雪仗小遊戲主頁 ❄ 本站最適合以 800x600 解析度瀏覽 ❄ 歡迎光臨 SNOWCRAFT 打雪仗小遊戲主頁 ❄</div>
       </div>
-      <div id="game-over" class="hidden">
-        <h2>遊戲結束</h2>
-        <p id="final-score">分數：0</p>
-        <button id="restart-btn">再玩一次</button>
+      <h1>❄ SNOWCRAFT ❄<br><span class="subtitle">～經典打雪仗網頁遊戲～</span></h1>
+    </div>
+
+    <div id="stage-frame">
+      <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-overlay">
+          <div id="score">0</div>
+          <div id="level">Level 1</div>
+          <div id="message" class="hidden"></div>
+          <div id="start-screen">
+            <h1>❄ Snowcraft ❄</h1>
+            <p>經典打雪仗</p>
+            <p class="controls">操作：點擊並按住紅帽角色移動，放開滑鼠投擲雪球</p>
+            <button id="start-btn">開始遊戲</button>
+          </div>
+          <div id="game-over" class="hidden">
+            <h2>遊戲結束</h2>
+            <p id="final-score">分數：0</p>
+            <button id="restart-btn">再玩一次</button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <table id="howto-table" cellpadding="0" cellspacing="0">
+      <tr><td class="howto-title">📜 遊戲說明 README.TXT 📜</td></tr>
+      <tr><td class="howto-body">
+        <ul>
+          <li>🖱️ 用滑鼠<b>點擊並按住</b>下方紅帽角色</li>
+          <li>🖱️ 移動滑鼠<b>拖曳</b>該角色（只能在下半場活動）</li>
+          <li>🖱️ <b>放開滑鼠</b>即可朝滑鼠方向投擲雪球，按住越久力道越強</li>
+          <li>🎯 目標：打倒所有綠色敵人進入下一關</li>
+          <li>❤️ 紅隊每位角色可承受 <b>2 次</b>命中，綠隊 <b>3 次</b></li>
+          <li>💀 全部紅隊倒下則遊戲結束</li>
+        </ul>
+      </td></tr>
+    </table>
+
+    <div id="footer">
+      <hr>
+      <p>© <span id="year"></span> Snowcraft 打雪仗小遊戲 ｜ 最佳瀏覽環境：Netscape Navigator 4.0 以上 😉</p>
+      <p class="blink">👷 本網站持續施工中 👷</p>
+    </div>
+
   </div>
+
   <script src="game.js"></script>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 </html>

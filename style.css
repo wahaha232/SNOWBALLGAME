@@ -3,32 +3,97 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
 html, body {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #cce8f5;
-  font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  min-height: 100%;
+  background: #000080 repeating-conic-gradient(#000080 0% 25%, #08007a 0% 50%) 0 0/24px 24px;
+  font-family: "Comic Sans MS", "Times New Roman", "Microsoft JhengHei", cursive, serif;
+  color: #000;
 }
+
+/* ============ 1990~2000 復古網頁風格 ============ */
+
+#page {
+  max-width: 860px;
+  margin: 18px auto 40px;
+  background: #d6d6d6;
+  border: 4px outset #ffffff;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+  padding: 10px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#banner {
+  background: linear-gradient(180deg, #6fa8ff 0%, #1e5ecb 50%, #003399 100%);
+  border: 3px inset #ffffff;
+  text-align: center;
+  padding: 10px 0 14px;
+  margin-bottom: 10px;
+}
+
+#banner h1 {
+  color: #ffff00;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  text-shadow: 2px 2px 0 #ff0000, -1px -1px 0 #000;
+  letter-spacing: 2px;
+  margin-top: 8px;
+}
+
+#banner .subtitle {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.marquee-wrap {
+  overflow: hidden;
+  white-space: nowrap;
+  background: #000;
+  border-bottom: 2px solid #ffff00;
+  padding: 3px 0;
+}
+
+.marquee-text {
+  display: inline-block;
+  color: #00ff00;
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+  padding-left: 100%;
+  animation: marquee 14s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+#stage-frame {
+  background: #b0b0b0;
+  border: 4px outset #ffffff;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ============ 遊戲畫面（置中） ============ */
 
 #game-container {
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
   background: linear-gradient(to bottom, #a8d8f0 0%, #e8f4fc 60%, #f5fafc 100%);
+  border: 3px inset #666;
+  line-height: 0;
 }
 
 #gameCanvas {
   display: block;
   max-width: 100%;
-  max-height: 100%;
   background: transparent;
   cursor: crosshair;
   touch-action: none;
@@ -162,9 +227,69 @@ button:active {
   transform: translateY(0);
 }
 
+/* ============ 遊戲說明 README 區塊 ============ */
+
+#howto-table {
+  width: 100%;
+  margin-top: 12px;
+  background: #ffffe0;
+  border: 3px inset #999;
+}
+
+#howto-table .howto-title {
+  background: linear-gradient(180deg, #808080, #404040);
+  color: #fff;
+  font-weight: bold;
+  padding: 6px 10px;
+  font-family: "Courier New", monospace;
+  letter-spacing: 1px;
+}
+
+#howto-table .howto-body {
+  padding: 12px 18px;
+  font-family: "Courier New", monospace;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #222;
+}
+
+#howto-table ul {
+  list-style: none;
+}
+
+#howto-table li {
+  margin-bottom: 6px;
+}
+
+/* ============ Footer ============ */
+
+#footer {
+  text-align: center;
+  margin-top: 14px;
+  color: #ddd;
+  font-size: 0.85rem;
+}
+
+#footer hr {
+  border: 1px solid #fff;
+  border-bottom: 1px solid #808080;
+  margin-bottom: 8px;
+}
+
+.blink {
+  animation: blink 1s steps(1) infinite;
+  color: #ffff00;
+  font-weight: bold;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
 /* 小螢幕調整 */
 @media (max-width: 600px) {
   #score { font-size: 22px; top: 12px; right: 14px; }
   #level { font-size: 16px; top: 12px; left: 14px; }
   #message { font-size: 26px; padding: 12px 20px; }
+  #banner h1 { font-size: 1.6rem; }
 }

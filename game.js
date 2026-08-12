@@ -22,6 +22,10 @@
   let players = [];
   let enemies = [];
   let snowballs = [];
+  // Decorative snow-fort mounds (matches the reference art's terrain bumps).
+  // Positions are stored as fractions of W/H so they stay correctly placed
+  // across resizes without needing any rescaling logic of their own.
+  let snowForts = [];
 
   // BUG FIX: resizing mid-game used to leave existing characters/snowballs at their
   // old pixel positions (and, since radius was baked in at spawn time, at their old
@@ -31,8 +35,11 @@
   // so it always reflects the current `scale` without needing per-entity updates.
   function resize() {
     const prevW = W, prevH = H;
-    const maxW = Math.min(window.innerWidth, 960);
-    const maxH = Math.min(window.innerHeight, 720);
+    // The game now sits inside a framed, centered page section (not a
+    // fullscreen app), so it's bounded by the page's content width and a
+    // comfortable viewport-height fraction rather than the full window.
+    const maxW = Math.min(window.innerWidth - 40, 760);
+    const maxH = Math.min(window.innerHeight * 0.62, 560);
     // 保持約 4:3 比例，適合經典遊戲
     const ratio = 4 / 3;
     if (maxW / maxH > ratio) {
@@ -260,94 +267,164 @@
       this.y = Math.max(margin + 30, Math.min(H - margin - 10, this.y));
     }
 
+    // ART STYLE: redrawn to match the reference screenshot's look — a chibi
+    // figure with small dark boots, a rounded snowsuit body in the team
+    // color, and an asymmetric pointed hood with a curled tip (instead of
+    // the previous plain circle + symmetric arc). A ground-level selection
+    // reticle (concentric flattened rings) replaces the old glow ring, and
+    // knocked-out characters now squash flat into a "splat" on the ground
+    // instead of just fading out standing upright.
     draw(ctx) {
       if (!this.alive && this.koTimer <= 0) return;
+      const r = this.radius;
 
       ctx.save();
       ctx.translate(this.x, this.y);
 
-      const alpha = this.alive ? 1 : Math.max(0, Math.min(1, this.koTimer / 0.4));
-      ctx.globalAlpha = alpha;
+      // Ground selection reticle — drawn first so it sits under the character.
+      if (selectedPlayer === this) {
+        const ringY = r * 0.85;
+        ctx.save();
+        ctx.globalAlpha = 0.8;
+        [1, 0.65].forEach((k, i) => {
+          ctx.beginPath();
+          ctx.ellipse(0, ringY, r * 1.3 * k, r * 0.5 * k, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = i === 0 ? "rgba(255, 220, 60, 0.85)" : "rgba(255, 220, 60, 0.5)";
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 4]);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+        if (mouse.down) {
+          const p = Math.min(1, (performance.now() - chargeStart) / MAX_CHARGE_MS);
+          ctx.beginPath();
+          ctx.ellipse(0, ringY, r * 1.3, r * 0.5, 0, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 150, 40, ${0.6 + p * 0.4})`;
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          // charge sparkle stars
+          const starAngle = performance.now() * 0.006;
+          for (let i = 0; i < 3; i++) {
+            const a = starAngle + (i * Math.PI * 2) / 3;
+            drawStar(ctx, Math.cos(a) * r * 1.5, ringY + Math.sin(a) * r * 0.55, 3.5 * (0.6 + p * 0.4), "rgba(120, 190, 255, 0.9)");
+          }
+        }
+        ctx.restore();
+      }
+
+      if (!this.alive) {
+        // Knocked out: squash into a flat splat on the ground instead of
+        // standing there fading — matches the "melted" look in the reference.
+        const squash = 1 - Math.max(0, Math.min(1, this.koTimer / 1.2));
+        const flat = 0.22 + 0.78 * (1 - squash);
+        ctx.globalAlpha = Math.max(0, Math.min(1, this.koTimer / 0.3));
+        ctx.beginPath();
+        ctx.ellipse(0, r * 0.6, r * (0.95 + squash * 0.35), r * 0.55 * flat, 0, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(0, r * 0.5, r * 0.4, r * 0.28 * flat, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#fefefe";
+        ctx.fill();
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 1.5;
+        const s = r * 0.12;
+        [[-0.16, 0], [0.16, 0]].forEach(([ox, oy]) => {
+          const cy = r * 0.5 + oy * flat;
+          ctx.beginPath();
+          ctx.moveTo(ox * r - s, cy - s * flat);
+          ctx.lineTo(ox * r + s, cy + s * flat);
+          ctx.moveTo(ox * r + s, cy - s * flat);
+          ctx.lineTo(ox * r - s, cy + s * flat);
+          ctx.stroke();
+        });
+        ctx.restore();
+        return;
+      }
+
+      const flash = this.hitFlash > 0;
 
       // 陰影
       ctx.beginPath();
-      ctx.ellipse(0, this.radius * 0.7, this.radius * 0.7, this.radius * 0.25, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, r * 0.95, r * 0.65, r * 0.22, 0, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(0,0,0,0.12)";
       ctx.fill();
 
-      // 身體 (圓形)
+      // 腳 (boots)
+      ctx.fillStyle = "#2c3e50";
+      [-0.3, 0.3].forEach(ox => {
+        ctx.beginPath();
+        ctx.ellipse(ox * r, r * 0.82, r * 0.22, r * 0.3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 身體 (橢圓，比正圓更像雪衣輪廓)
       ctx.beginPath();
-      ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = this.hitFlash > 0 ? "#fff" : this.color;
+      ctx.ellipse(0, r * 0.12, r * 0.82, r * 0.92, 0, 0, Math.PI * 2);
+      ctx.fillStyle = flash ? "#fff" : this.color;
       ctx.fill();
       ctx.strokeStyle = "rgba(0,0,0,0.15)";
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // 帽子 (hood)
+      // 帽子 — 不對稱尖帽，一側垂下並捲起（取代原本置中的對稱弧形）
+      const hoodDir = this.isPlayer ? 1 : -1;
       ctx.beginPath();
-      ctx.arc(0, -this.radius * 0.35, this.radius * 0.85, Math.PI * 0.9, Math.PI * 2.1);
-      ctx.fillStyle = this.hitFlash > 0 ? "#eee" : this.hatColor;
+      ctx.moveTo(-r * 0.62 * hoodDir, -r * 0.05);
+      ctx.quadraticCurveTo(-r * 0.55 * hoodDir, -r * 0.95, r * 0.05 * hoodDir, -r * 1.05);
+      ctx.quadraticCurveTo(r * 0.75 * hoodDir, -r * 0.85, r * 0.95 * hoodDir, -r * 0.15);
+      ctx.quadraticCurveTo(r * 1.35 * hoodDir, r * 0.25, r * 1.05 * hoodDir, r * 0.35);
+      ctx.quadraticCurveTo(r * 0.85 * hoodDir, r * 0.15, r * 0.6 * hoodDir, -r * 0.05);
+      ctx.closePath();
+      ctx.fillStyle = flash ? "#eee" : this.hatColor;
+      ctx.fill();
+      // pom-pom at the tip of the hood
+      ctx.beginPath();
+      ctx.arc(r * 1.05 * hoodDir, r * 0.35, r * 0.16, 0, Math.PI * 2);
+      ctx.fillStyle = flash ? "#eee" : this.hatColor;
       ctx.fill();
 
       // 臉部白區
       ctx.beginPath();
-      ctx.arc(0, this.radius * 0.05, this.radius * 0.55, 0, Math.PI * 2);
-      ctx.fillStyle = this.hitFlash > 0 ? "#fff" : "#fefefe";
+      ctx.ellipse(0, r * 0.05, r * 0.5, r * 0.48, 0, 0, Math.PI * 2);
+      ctx.fillStyle = flash ? "#fff" : "#fefefe";
       ctx.fill();
 
       // 眼睛
-      if (this.alive) {
-        ctx.fillStyle = "#222";
-        ctx.beginPath();
-        ctx.arc(-this.radius * 0.22, -this.radius * 0.05, this.radius * 0.12, 0, Math.PI * 2);
-        ctx.arc(this.radius * 0.22, -this.radius * 0.05, this.radius * 0.12, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        // X 眼睛
-        ctx.strokeStyle = "#333";
-        ctx.lineWidth = 2;
-        const s = this.radius * 0.18;
-        [[-0.22, -0.05], [0.22, -0.05]].forEach(([ox, oy]) => {
-          ctx.beginPath();
-          ctx.moveTo(ox * this.radius - s, oy * this.radius - s);
-          ctx.lineTo(ox * this.radius + s, oy * this.radius + s);
-          ctx.moveTo(ox * this.radius + s, oy * this.radius - s);
-          ctx.lineTo(ox * this.radius - s, oy * this.radius + s);
-          ctx.stroke();
-        });
-      }
+      ctx.fillStyle = "#222";
+      ctx.beginPath();
+      ctx.arc(-r * 0.2, r * 0.0, r * 0.11, 0, Math.PI * 2);
+      ctx.arc(r * 0.2, r * 0.0, r * 0.11, 0, Math.PI * 2);
+      ctx.fill();
 
       // HP 指示（小點）
-      if (this.alive && this.hp < this.maxHp) {
+      if (this.hp < this.maxHp) {
         ctx.fillStyle = "rgba(255,200,50,0.9)";
         for (let i = 0; i < this.hp; i++) {
           ctx.beginPath();
-          ctx.arc(-this.radius * 0.3 + i * this.radius * 0.3, this.radius + 6, 3, 0, Math.PI * 2);
+          ctx.arc(-r * 0.3 + i * r * 0.3, -r * 1.2, 3, 0, Math.PI * 2);
           ctx.fill();
-        }
-      }
-
-      // 選中光環
-      if (selectedPlayer === this) {
-        ctx.beginPath();
-        ctx.arc(0, 0, this.radius + 6, 0, Math.PI * 2);
-        ctx.strokeStyle = "rgba(255, 220, 50, 0.7)";
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        // 蓄力圈
-        if (mouse.down) {
-          const p = Math.min(1, (performance.now() - chargeStart) / MAX_CHARGE_MS);
-          ctx.beginPath();
-          ctx.arc(0, 0, this.radius + 10, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2);
-          ctx.strokeStyle = `rgba(255, 180, 50, ${0.5 + p * 0.5})`;
-          ctx.lineWidth = 4;
-          ctx.stroke();
         }
       }
 
       ctx.restore();
     }
+  }
+
+  // 4 角星形裝飾（充能特效用）
+  function drawStar(ctx, cx, cy, size, color) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.beginPath();
+    for (let i = 0; i < 4; i++) {
+      const a = (i * Math.PI) / 2;
+      ctx.lineTo(Math.cos(a) * size, Math.sin(a) * size);
+      ctx.lineTo(Math.cos(a + Math.PI / 4) * size * 0.35, Math.sin(a + Math.PI / 4) * size * 0.35);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
   }
 
   // ============ Snowball ============
@@ -424,6 +501,17 @@
     for (let i = 0; i < enemyCount; i++) {
       const e = new Character(eSpacing * (i + 1) + (Math.random() - 0.5) * 20, 80 * scale + Math.random() * 40, false);
       enemies.push(e);
+    }
+
+    // 雪堡地形裝飾（純視覺，不影響碰撞），數量隨關卡略增
+    snowForts = [];
+    const fortCount = 2 + Math.min(2, Math.floor(level / 2));
+    for (let i = 0; i < fortCount; i++) {
+      snowForts.push({
+        fx: 0.12 + Math.random() * 0.76,
+        fy: 0.2 + Math.random() * 0.35,
+        size: 0.8 + Math.random() * 0.6
+      });
     }
 
     levelEl.textContent = `Level ${level}`;
@@ -676,6 +764,29 @@
     grd.addColorStop(1, "rgba(220,235,245,0.5)");
     ctx.fillStyle = grd;
     ctx.fillRect(0, H * 0.7, W, H * 0.3);
+
+    // 雪堡地形（純裝飾，比照參考圖的地面雪丘）
+    snowForts.forEach(f => {
+      const x = f.fx * W, y = f.fy * H;
+      const s = f.size * 26 * scale;
+      ctx.beginPath();
+      ctx.ellipse(x, y + s * 0.3, s, s * 0.55, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0.06)";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(x, y, s, s * 0.62, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "#f3f8fc";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(x - s * 0.15, y - s * 0.15, s * 0.55, s * 0.35, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(180,200,220,0.5)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(x, y, s, s * 0.62, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    });
   }
 
   function draw() {
